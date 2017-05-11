@@ -23,5 +23,5 @@ unsigned int fibonacci (unsigned int n){
         current += prev;
         prev = tmp;
     } 
-    return n == 0 ? (unsigned)0 : current;
+    return current;
 }
