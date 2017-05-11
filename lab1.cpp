@@ -15,5 +15,13 @@ double power (double base, unsigned int n){
     return res;
 }
 unsigned int fibonacci (unsigned int n){
-    
+    unsigned current = 0;
+    unsigned prev = 1;
+    unsigned tmp;
+    for(unsigned i = 0; i < n; ++i){
+        tmp = current;
+        current += prev;
+        prev = tmp;
+    } 
+    return n == 0 ? (unsigned)0 : current;
 }
