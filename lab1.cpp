@@ -12,7 +12,7 @@ double power (double base, unsigned int n){
     for(unsigned i = 1; i < n; ++i){
         res *= base;
     } 
-    return res;
+    return n == 0 ? 1. : res;
 }
 unsigned int fibonacci (unsigned int n){
     unsigned current = 0;
