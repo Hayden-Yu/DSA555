@@ -197,6 +197,7 @@ public:
         for(const_iterator itor = rhs.begin(); itor != rhs.end(); itor++){
             push_back(*itor);
         }
+        return *this;
     }
     DList(DList&& rhs){
         init();
@@ -209,5 +210,6 @@ public:
         front_->next_ = rhs->front_->next_;
         back_->prev_ = rhs->back_->prev_;
         rhs->front_->next_ = rhs->back_->prev_ = nullptr;
+        return *this;
     }
 };
