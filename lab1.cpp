@@ -1,7 +1,7 @@
 /*starter file for lab1*/
 
 unsigned int factorial(unsigned int n){
-    unsigned res = n;
+    unsigned res = n; 
     while(n > 1) {
         res *= --n;
     }
