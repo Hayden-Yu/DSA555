@@ -2,6 +2,11 @@
 #include <utility>
 using namespace std;
 
+/*
+ *Part B: functions modified:
+  search, copy constructor, update, assignment operator, destructor
+ */
+
 template <class TYPE>
 class Table{
 public:
@@ -177,15 +182,15 @@ const SimpleTable<TYPE>& SimpleTable<TYPE>::operator=(const SimpleTable<TYPE>& o
 		if(records_){
 			int sz=size_;
 			for(int i=0;i<sz;i++){
-				remove(records_[0]->key_);
+				delete records_[i];
 			}
 			delete [] records_;
 		}
 		records_=new Record*[other.max_];
 		max_=other.max_;
-		size_=0;
+		size_=other.size_;
 		for(int i=0;i<other.size_;i++){
-			update(other.records_[i]->key_,other.records_[i]->data_);
+		    records_[i] = new Record(other.records_[i]->key_, other.records_[i]->data_);	
 		}
 
 	}
@@ -203,7 +208,7 @@ SimpleTable<TYPE>::~SimpleTable(){
 	if(records_){
 		int sz=size_;
 		for(int i=0;i<sz;i++){
-			remove(records_[0]->key_);
+			delete records_[i];
 		}
 		delete [] records_;
 	}
