@@ -221,7 +221,6 @@ class LPTable:public Table<TYPE>{
     string* keys_;
     TYPE* data_;
     size_t max_;
-    void grow();
 public:
     LPTable(int maxExpected);
     LPTable(const LPTable& other);
@@ -235,16 +234,6 @@ public:
 };
 /* none of the code in the function definitions below are correct.  You can replace what you need
 */
-template <class TYPE>
-void LPTable<TYPE>::grow() {
-    string* oldKeys = keys_;
-    TYPE* oldData = data_;
-    size_t oldMax = max_;
-    keys_ = new string[max_ *= 2];
-    data_ = new TYPE[max_];
-    for(size_t i = 0; i < max_; update(oldKeys[i], oldData[i])); 
-}
-
 template <class TYPE>
 LPTable<TYPE>::LPTable(int maxExpected): Table<TYPE>(){
     keys_ = new string[max_ = maxExpected];
@@ -279,7 +268,7 @@ bool LPTable<TYPE>::update(const string& key, const TYPE& value){
             data_[i] = value;
             return true;
         }
-        else if(keys_[i].empty()) {
+        else if(keys_[i].empty()) { //key doesnt exist
             keys_[i] = key;
             data_[i] = value;
             return true;
@@ -287,8 +276,6 @@ bool LPTable<TYPE>::update(const string& key, const TYPE& value){
         i = (i + 1) % max_;
     } while(i != idx);
     return false;
-    //grow();
-    //return update(key, value);
 }
 
 template <class TYPE>
@@ -296,18 +283,17 @@ bool LPTable<TYPE>::remove(const string& key){
     size_t idx = hash<string>{}(key) % max_; 
     size_t emptySlot;
     size_t j;
+    //find the record
     for(size_t i = idx; !keys_[i % max_].empty() && i - max_ != idx; i++) {
         if(keys_[i % max_] == key) {
-            keys_[i % max_] = "";
-            i = j = emptySlot = i % max_;
-        
-            while(!keys_[++j % max_].empty() && (int)(j - max_) <= (int)i) {
-                idx = hash<string>{}(keys_[j % max_]) % max_;
-                if(idx <= emptySlot % max_) {
-                    keys_[emptySlot % max_] = keys_[idx];
-                    data_[emptySlot % max_] = data_[idx];
-                    emptySlot = idx;
-                }
+            //delete the record
+            keys_[i %= max_] = "";
+            
+            for(size_t j = i + 1; !keys_[j % max_].empty() && j - max_ != i; j++) {
+                string k = keys_[j % max_];
+                TYPE v = data_[j % max_];
+                keys_[j % max_] = "";
+                update(k, v);
             }
             return true;
         }
@@ -357,3 +343,4 @@ LPTable<TYPE>::~LPTable(){
     delete [] keys_;
     delete [] data_;
 }
+
