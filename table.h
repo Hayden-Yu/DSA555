@@ -221,6 +221,8 @@ class LPTable:public Table<TYPE>{
     string* keys_;
     TYPE* data_;
     size_t max_;
+    size_t size_;
+    size_t max__;
 public:
     LPTable(int maxExpected);
     LPTable(const LPTable& other);
@@ -236,14 +238,16 @@ public:
 */
 template <class TYPE>
 LPTable<TYPE>::LPTable(int maxExpected): Table<TYPE>(){
-    keys_ = new string[max_ = maxExpected];
-    data_ = new TYPE[maxExpected];
+    keys_ = new string[max_ = (int)(maxExpected * 1.5)];
+    max__ = maxExpected;
+    data_ = new TYPE[max_];
 }
 
 template <class TYPE>
 LPTable<TYPE>::LPTable(const LPTable<TYPE>& other){
     keys_ = new string[max_ = other.max_];
     data_ = new TYPE[max_];
+    max__ = other.max__;
     for(size_t i = 0; i < max_; i++){
         if(!other.keys_[i].empty()) {
             keys_[i] = other.keys_[i];
@@ -256,6 +260,7 @@ LPTable<TYPE>::LPTable(LPTable<TYPE>&& other){
     keys_ = other.keys_;
     data_ = other.data_;
     max_ = other.max_;
+    max__ = other.max__;
     other.keys_ = nullptr;
     other.data_ = nullptr;
 }
@@ -269,8 +274,12 @@ bool LPTable<TYPE>::update(const string& key, const TYPE& value){
             return true;
         }
         else if(keys_[i].empty()) { //key doesnt exist
+            if(size_ == max__) {
+                return false;
+            }
             keys_[i] = key;
             data_[i] = value;
+            size_++;
             return true;
         }
         i = (i + 1) % max_;
@@ -288,11 +297,13 @@ bool LPTable<TYPE>::remove(const string& key){
         if(keys_[i % max_] == key) {
             //delete the record
             keys_[i %= max_] = "";
+            size_--;
             
             for(size_t j = i + 1; !keys_[j % max_].empty() && j - max_ != i; j++) {
                 string k = keys_[j % max_];
                 TYPE v = data_[j % max_];
                 keys_[j % max_] = "";
+                size_--;
                 update(k, v);
             }
             return true;
@@ -320,6 +331,7 @@ const LPTable<TYPE>& LPTable<TYPE>::operator=(const LPTable<TYPE>& other){
         delete [] data_;
         keys_ = new string[max_ = other.max_];
         data_ = new TYPE[max_];
+        max__ = other.max__;
         for(size_t i = 0; i < max_; i++){
             if(!other.keys_[i].empty()) {
                 keys_[i] = other.keys_[i];
@@ -335,6 +347,7 @@ const LPTable<TYPE>& LPTable<TYPE>::operator=(LPTable<TYPE>&& other){
     swap(keys_, other.keys_);
     swap(data_, other.data_);
     swap(max_, other.max_);
+    swap(max__, other.max__);
     return *this;
 }
 
